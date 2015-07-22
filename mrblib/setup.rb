@@ -90,7 +90,7 @@ MRuby::CrossBuild.new('x86_64-apple-darwin14') do |conf|
   gem_config(conf)
 end
 
-MRuby::CrossBuild.new('mingw-w64') do |conf|
+MRuby::CrossBuild.new('x86_64-w64-mingw32') do |conf|
   toolchain :gcc
 
   [conf.cc, conf.linker].each do |cc|

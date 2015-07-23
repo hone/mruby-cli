@@ -9,7 +9,7 @@ module MrubyCli
 
     def run
       if app_name = @options.option(:setup)
-        Setup.new(app_name).run
+        Setup.new(app_name, @output_io).run
       elsif @options.option(:version)
         Version.new(@output_io).run
       end

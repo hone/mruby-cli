@@ -1,7 +1,8 @@
 module MrubyCli
   class Setup
-    def initialize(name)
-      @name = name
+    def initialize(name, output)
+      @name   = name
+      @output = output
     end
 
     def run
@@ -24,6 +25,7 @@ module MrubyCli
 
     private
     def write_file(file, contents)
+      @output.puts "  create  #{file}"
       File.open(file, 'w') {|file| file.puts contents }
     end
 

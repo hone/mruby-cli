@@ -192,11 +192,6 @@ MRUBY_CONFIG=File.expand_path(ENV["MRUBY_CONFIG"] || "build_config.rb")
 INSTALL_PREFIX=ENV["INSTALL_PREFIX"] || "\#{APP_ROOT}/build"
 MRUBY_VERSION=ENV["MRUBY_VERSION"] || "1.1.0"
 
-desc "Setup Docker for building things locally"
-task :setup => ["Dockerfile", "docker-compose.yml"] do
-  sh "docker-compose build"
-end
-
 file :mruby do
   sh "git clone https://github.com/mruby/mruby"
 end

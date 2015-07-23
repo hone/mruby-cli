@@ -40,3 +40,10 @@ assert('setup can compile and run the generated app') do
     end
   end
 end
+
+assert('version') do
+  require_relative '../mrblib/version'
+  output, status = Open3.capture2("#{BIN_PATH}", "--version")
+  assert_true status.success?, "Process did not exit cleanly"
+  assert_include output, "mruby-cli version #{MrubyCli::Version::VERSION}"
+end

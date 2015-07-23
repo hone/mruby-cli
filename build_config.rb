@@ -3,6 +3,8 @@ def gem_config(conf)
 
   # be sure to include this gem
   conf.gem File.expand_path(File.dirname(__FILE__))
+  # need to override mruby-io dep on mruby-mtest until CrossBuild changes make it upstream
+  conf.gem :github => 'hone/mruby-io'
 end
 
 MRuby::Build.new do |conf|

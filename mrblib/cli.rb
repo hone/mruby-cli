@@ -1,28 +1,27 @@
 module MrubyCli
   class CLI
     def initialize(argv, output_io = $stdout, error_io = $stderr)
-      class << argv; include Getopts; end
-      @opts = argv.getopts(short_opts, *long_opts)
+      @options = setup_options
+      @opts = @options.parse(argv)
+      @output_io = output_io
+      @error_io  = error_io
     end
 
     def run
-      if app_name = (@opts["s"] || @opts["setup"])
+      if app_name = @options.option(:setup)
         Setup.new(app_name).run
-      elsif @opts["h"] || @opts["help"]
-        help
+      elsif @options.option(:version)
+        Version.new(@output_io).run
       end
     end
 
     private
-    def short_opts
-      "s:h"
-    end
+    def setup_options
+      options = Options.new
+      options.add(Option.new("setup", "s", true))
+      options.add(Option.new("version", "v"))
 
-    def long_opts
-      %w(setup: help)
-    end
-    
-    def help
+      options
     end
   end
 end

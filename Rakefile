@@ -33,10 +33,24 @@ namespace :test do
     end
   end
 
+  def clean_env(envs)
+    old_env = {}
+    envs.each do |key|
+      old_env[key] = ENV[key]
+      ENV[key] = nil
+    end
+    yield
+    envs.each do |key|
+      ENV[key] = old_env[key]
+    end
+  end
+
   desc "run integration tests"
   task :bintest => :compile do
     MRuby.each_target do |target|
-      run_bintest if bintest_enabled?
+      clean_env(%w(MRUBY_ROOT MRUBY_CONFIG)) do
+        run_bintest if bintest_enabled?
+      end
     end
   end
 end

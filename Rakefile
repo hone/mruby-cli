@@ -12,7 +12,6 @@ ENV['MRUBY_CONFIG'] = mruby_config
 Rake::Task[:mruby].invoke unless Dir.exist?(mruby_root)
 Dir.chdir(mruby_root)
 load "#{mruby_root}/Rakefile"
-INSTALL_PREFIX=ENV["INSTALL_PREFIX"] || "#{APP_ROOT}/build"
 
 desc "compile binary"
 task :compile => [:mruby, :all]

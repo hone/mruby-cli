@@ -237,7 +237,7 @@ INSTALL_PREFIX=ENV["INSTALL_PREFIX"] || "\#{APP_ROOT}/build"
 MRUBY_VERSION=ENV["MRUBY_VERSION"] || "1.1.0"
 
 file :mruby do
-  sh "git clone https://github.com/mruby/mruby"
+  sh "git clone --depth=1 https://github.com/mruby/mruby"
 end
 
 desc "compile binary"

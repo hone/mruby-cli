@@ -12,6 +12,8 @@ module MrubyCli
         Setup.new(app_name, @output_io).run
       elsif @options.option(:version)
         Version.new(@output_io).run
+      else
+        Help.new(@output_io).run
       end
     end
 
@@ -20,6 +22,7 @@ module MrubyCli
       options = Options.new
       options.add(Option.new("setup", "s", true))
       options.add(Option.new("version", "v"))
+      options.add(Option.new("help", "h"))
 
       options
     end

@@ -8,7 +8,7 @@ def gem_config(conf)
 end
 
 MRuby::Build.new do |conf|
-  toolchain :clang
+  toolchain :gcc
 
   conf.enable_bintest
 

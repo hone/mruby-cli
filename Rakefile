@@ -3,6 +3,7 @@ file :mruby do
   sh "git clone https://github.com/mruby/mruby"
 end
 
+APP_NAME=ENV["APP_NAME"] || "mruby-cli"
 APP_ROOT=ENV["APP_ROOT"] || Dir.pwd
 # avoid redefining constants in mruby Rakefile
 mruby_root=File.expand_path(ENV["MRUBY_ROOT"] || "#{APP_ROOT}/mruby")
@@ -14,7 +15,11 @@ Dir.chdir(mruby_root)
 load "#{mruby_root}/Rakefile"
 
 desc "compile binary"
-task :compile => [:mruby, :all]
+task :compile => [:mruby, :all] do
+  %W(#{MRUBY_ROOT}/build/host/bin/#{APP_NAME} #{MRUBY_ROOT}/build/i686-pc-linux-gnu/#{APP_NAME}").each do |bin|
+    sh "strip --strip-unneeded #{bin}" if File.exist?(bin)
+  end
+end
 
 namespace :test do
   desc "run mruby & unit tests"

@@ -229,6 +229,7 @@ DOCKER_COMPOSE_YML
 
     def rakefile
       <<RAKEFILE
+APP_NAME=ENV["APP_NAME"] || "#{@name}"
 APP_ROOT=ENV["APP_ROOT"] || Dir.pwd
 MRUBY_ROOT=ENV["MRUBY_ROOT"] || "\#{APP_ROOT}/mruby"
 MRUBY_CONFIG=File.expand_path(ENV["MRUBY_CONFIG"] || "build_config.rb")
@@ -242,6 +243,9 @@ end
 desc "compile binary"
 task :compile => :mruby do
   sh "cd \#{MRUBY_ROOT} && MRUBY_CONFIG=\#{MRUBY_CONFIG} rake all"
+  %W(\#{MRUBY_ROOT}/build/host/bin/\#{APP_NAME} \#{MRUBY_ROOT}/build/i686-pc-linux-gnu/\#{APP_NAME}").each do |bin|
+    sh "strip --strip-unneeded \#{bin}" if File.exist?(bin)
+  end
 end
 
 namespace :test do

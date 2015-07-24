@@ -1,6 +1,6 @@
 MRUBY_VERSION=ENV["MRUBY_VERSION"] || "1.1.0"
 file :mruby do
-  sh "git clone https://github.com/mruby/mruby"
+  sh "git clone --depth=1 https://github.com/mruby/mruby"
 end
 
 APP_NAME=ENV["APP_NAME"] || "mruby-cli"

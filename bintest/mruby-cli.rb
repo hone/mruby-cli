@@ -48,3 +48,9 @@ assert('version') do
   assert_true status.success?, "Process did not exit cleanly"
   assert_include output, "mruby-cli version #{MrubyCli::Version::VERSION}"
 end
+
+assert('help') do
+  output, status = Open3.capture2("#{BIN_PATH}", "--help")
+  assert_true status.success?, "Process did not exit cleanly"
+  assert_include output, "mruby-cli [switches] [arguments]"
+end

@@ -1,6 +1,6 @@
 MRuby::Gem::Specification.new('mruby-cli') do |spec|
   spec.license = 'MIT'
-  spec.author  = 'Terence Lee'
+  spec.authors = ['Terence Lee', 'Zachary Scott']
   spec.summary = 'mruby cli utility'
   spec.bins    = ['mruby-cli']
 

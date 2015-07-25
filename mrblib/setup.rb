@@ -261,6 +261,7 @@ namespace :test do
 end
 
 desc "run all tests"
+Rake::Task['test'].clear
 task :test => ["test:mtest", "test:bintest"]
 
 desc "cleanup"

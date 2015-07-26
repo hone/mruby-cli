@@ -12,7 +12,7 @@ assert('setup') do
       assert_true status.success?, "Process did not exit cleanly"
       assert_true Dir.exist?(app_name)
       Dir.chdir(app_name) do
-        (%w(mrbgem.rake build_config.rb Rakefile Dockerfile docker-compose.yml) + ["tools/#{app_name}/#{app_name}.c", "mrblib/#{app_name}.rb", "bintest/#{app_name}.rb"]).each do |file|
+        (%w(.gitignore mrbgem.rake build_config.rb Rakefile Dockerfile docker-compose.yml) + ["tools/#{app_name}/#{app_name}.c", "mrblib/#{app_name}.rb", "bintest/#{app_name}.rb"]).each do |file|
           assert_true(File.exist?(file), "Could not find #{file}")
           assert_include output, " create  #{file}"
         end
@@ -30,7 +30,7 @@ assert('setup can compile and run the generated app') do
       Dir.chdir(app_name) do
         output, status = Open3.capture2("rake compile")
         assert_true status.success?, "Process did not exit cleanly"
-        
+
         output, status = Open3.capture2("mruby/bin/#{app_name}")
         assert_true status.success?, "Process did not exit cleanly"
         assert_include output, "Hello World"

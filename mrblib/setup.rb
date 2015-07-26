@@ -8,6 +8,7 @@ module MRubyCLI
     def run
       Dir.mkdir(@name) unless Dir.exist?(@name)
       Dir.chdir(@name) do
+        write_file(".gitignore", gitignore)
         write_file("mrbgem.rake", mrbgem_rake)
         write_file("build_config.rb", build_config_rb)
         write_file("Rakefile", rakefile)
@@ -102,6 +103,12 @@ MRuby::Gem::Specification.new('#{@name}') do |spec|
   spec.add_dependency 'mruby-mtest', :mgem => 'mruby-mtest'
 end
 MRBGEM_RAKE
+    end
+
+    def gitignore
+      <<IGNORE
+mruby/
+IGNORE
     end
 
     def build_config_rb

@@ -37,16 +37,24 @@ Hello World
 ```
 
 ### Testing
-By default, `mruby-cli` generates tests that go in the `bintest` directory. It'll execute any files in there. These are integration style tests. It tests the status and output of the host binary inside a docker container. To run them just execute:
+By default, `mruby-cli` generates two kinds of tests: mtest and bintest.
+
+#### mtest
+These tests are unit tests, are written in mruby, and go in the `test/` directory. It uses the mrbgem [`mruby-mtest`](https://github.com/iij/mruby-mtest). The available methods to be used can be found [here](https://github.com/mruby/mruby/blob/master/test/assert.rb). To run the tests, just execute:
+
+```sh
+$ docker-compose run mtest
+```
+
+#### bintest
+These are integration tests, are written in CRuby (MRI), and go in the `bintest/` directory. It tests the status and output of the host binary inside a docker container. To run them just execute:
 
 ```sh
 $ docker-compose run bintest
 ```
 
-Unit testing in mruby can by accomplished using [`mruby-mtest`](https://github.com/iij/mruby-mtest).
-
 ### CLI Architecture
-The app is built from two parts a C wrapper in `tools/` and a mruby part in `mrblib/`. The C wrapper is fairly minimal and executes the `__main__` method in mruby and instantiates ARGV and passes it to the mruby code. The rest of the CLI is written in mruby.
+The app is built from two parts a C wrapper in `tools/` and a mruby part in `mrblib/`. The C wrapper is fairly minimal and executes the `__main__` method in mruby and instantiates ARGV and passes it to the mruby code. The rest of the CLI is written in mruby. The build tool for mruby is written in CRuby (MRI).
 
 ## mruby-cli Development
 This app is built as a mruby-cli app, so you just need to run: `docker-compose run compile` and find the binaries in the appropriate directories.

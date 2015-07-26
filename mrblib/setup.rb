@@ -20,6 +20,8 @@ module MrubyCli
         write_file("docker-compose.yml", docker_compose_yml)
         Dir.mkdir("bintest") unless Dir.exist?("bintest")
         write_file("bintest/#{@name}.rb", bintest)
+        Dir.mkdir("test") unless Dir.exist?("test")
+        write_file("test/test_#{@name}.rb", test)
       end
     end
 
@@ -27,6 +29,18 @@ module MrubyCli
     def write_file(file, contents)
       @output.puts "  create  #{file}"
       File.open(file, 'w') {|file| file.puts contents }
+    end
+
+    def test
+      <<TEST
+class Test#{Util.camelize(@name)} < MTest::Unit::TestCase
+  def test_main
+    assert_nil __main__
+  end
+end
+
+MTest::Unit.new.run
+TEST
     end
 
     def bintest
@@ -58,6 +72,7 @@ MRuby::Gem::Specification.new('#{@name}') do |spec|
   spec.bins    = ['#{@name}']
 
   spec.add_dependency 'mruby-print', :core => 'mruby-print'
+  spec.add_dependency 'mruby-mtest', :mgem => 'mruby-mtest'
 end
 MRBGEM_RAKE
     end
@@ -74,6 +89,8 @@ end
 MRuby::Build.new do |conf|
   toolchain :clang
 
+  conf.enable_bintest
+
   gem_config(conf)
 end
 
@@ -83,6 +100,8 @@ MRuby::CrossBuild.new('i686-pc-linux-gnu') do |conf|
   [conf.cc, conf.cxx, conf.linker].each do |cc|
     cc.flags << "-m32"
   end
+
+  conf.build_mrbtest_lib_only
 
   gem_config(conf)
 end
@@ -114,6 +133,8 @@ MRuby::CrossBuild.new('i386-apple-darwin14') do |conf|
   conf.build_target     = 'i386-pc-linux-gnu'
   conf.host_target      = 'i386-apple-darwin14'
 
+  conf.build_mrbtest_lib_only
+
   gem_config(conf)
 end
 
@@ -130,6 +151,8 @@ MRuby::CrossBuild.new('x86_64-w64-mingw32') do |conf|
   conf.build_target     = 'x86_64-pc-linux-gnu'
   conf.host_target      = 'x86_64-w64-mingw32'
 
+  conf.build_mrbtest_lib_only
+
   gem_config(conf)
 end
 
@@ -145,6 +168,8 @@ MRuby::CrossBuild.new('i686-w64-mingw32') do |conf|
 
   conf.build_target     = 'i686-pc-linux-gnu'
   conf.host_target      = 'i686-w64-mingw32'
+
+  conf.build_mrbtest_lib_only
 
   gem_config(conf)
 end
@@ -229,20 +254,23 @@ DOCKER_COMPOSE_YML
 
     def rakefile
       <<RAKEFILE
-APP_NAME=ENV["APP_NAME"] || "#{@name}"
-APP_ROOT=ENV["APP_ROOT"] || Dir.pwd
-MRUBY_ROOT=ENV["MRUBY_ROOT"] || "\#{APP_ROOT}/mruby"
-MRUBY_CONFIG=File.expand_path(ENV["MRUBY_CONFIG"] || "build_config.rb")
-INSTALL_PREFIX=ENV["INSTALL_PREFIX"] || "\#{APP_ROOT}/build"
-MRUBY_VERSION=ENV["MRUBY_VERSION"] || "1.1.0"
-
 file :mruby do
   sh "git clone --depth=1 https://github.com/mruby/mruby"
 end
 
+APP_NAME=ENV["APP_NAME"] || "#{@name}"
+APP_ROOT=ENV["APP_ROOT"] || Dir.pwd
+# avoid redefining constants in mruby Rakefile
+mruby_root=File.expand_path(ENV["MRUBY_ROOT"] || "\#{APP_ROOT}/mruby")
+mruby_config=File.expand_path(ENV["MRUBY_CONFIG"] || "build_config.rb")
+ENV['MRUBY_ROOT'] = mruby_root
+ENV['MRUBY_CONFIG'] = mruby_config
+Rake::Task[:mruby].invoke unless Dir.exist?(mruby_root)
+Dir.chdir(mruby_root)
+load "\#{mruby_root}/Rakefile"
+
 desc "compile binary"
-task :compile => :mruby do
-  sh "cd \#{MRUBY_ROOT} && MRUBY_CONFIG=\#{MRUBY_CONFIG} rake all"
+task :compile => [:mruby, :all] do
   %W(\#{MRUBY_ROOT}/build/host/bin/\#{APP_NAME} \#{MRUBY_ROOT}/build/i686-pc-linux-gnu/\#{APP_NAME}").each do |bin|
     sh "strip --strip-unneeded \#{bin}" if File.exist?(bin)
   end
@@ -250,13 +278,40 @@ end
 
 namespace :test do
   desc "run mruby & unit tests"
-  task :mtest => :compile do
-    sh "cd \#{MRUBY_ROOT} && MRUBY_CONFIG=\#{MRUBY_CONFIG} rake all test"
+  # only build mtest for host
+  task :mtest => [:compile] + MRuby.targets.values.map {|t| t.build_mrbtest_lib_only? ? nil : t.exefile("\#{t.build_dir}/test/mrbtest") }.compact do
+    # mruby-io tests expect to be in MRUBY_ROOT
+    Dir.chdir(MRUBY_ROOT) do
+      # in order to get mruby/test/t/synatx.rb __FILE__ to pass,
+      # we need to make sure the tests are built relative from MRUBY_ROOT
+      load "\#{MRUBY_ROOT}/test/mrbtest.rake"
+      MRuby.each_target do |target|
+        # only run unit tests here
+        target.enable_bintest = false
+        run_test unless build_mrbtest_lib_only?
+      end
+    end
+  end
+
+  def clean_env(envs)
+    old_env = {}
+    envs.each do |key|
+      old_env[key] = ENV[key]
+      ENV[key] = nil
+    end
+    yield
+    envs.each do |key|
+      ENV[key] = old_env[key]
+    end
   end
 
   desc "run integration tests"
   task :bintest => :compile do
-    sh "cd \#{MRUBY_ROOT} && ruby \#{MRUBY_ROOT}/test/bintest.rb \#{APP_ROOT}"
+    MRuby.each_target do |target|
+      clean_env(%w(MRUBY_ROOT MRUBY_CONFIG)) do
+        run_bintest if bintest_enabled?
+      end
+    end
   end
 end
 
@@ -268,8 +323,6 @@ desc "cleanup"
 task :clean do
   sh "cd \#{MRUBY_ROOT} && rake deep_clean"
 end
-
-task :default => :test
 RAKEFILE
     end
   end

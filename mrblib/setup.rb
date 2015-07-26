@@ -343,7 +343,7 @@ namespace :test do
 end
 
 desc "run all tests"
-Rake::Task['test'].clear
+Rake::Task['test'].clear if Rake::Task.task_defined?('test')
 task :test => ["test:mtest", "test:bintest"]
 
 desc "cleanup"

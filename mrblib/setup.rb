@@ -10,22 +10,49 @@ module MrubyCli
       Dir.chdir(@name) do
         write_file("mrbgem.rake", mrbgem_rake)
         write_file("build_config.rb", build_config_rb)
-        Dir.mkdir("tools") unless Dir.exist?("tools")
-        Dir.mkdir("tools/#{@name}") unless Dir.exist?("tools/#{@name}")
-        write_file("tools/#{@name}/#{@name}.c", tools)
-        Dir.mkdir("mrblib") unless Dir.exist?("mrblib")
-        write_file("mrblib/#{@name}.rb", mrblib)
         write_file("Rakefile", rakefile)
         write_file("Dockerfile", dockerfile)
         write_file("docker-compose.yml", docker_compose_yml)
-        Dir.mkdir("bintest") unless Dir.exist?("bintest")
+
+        create_dir_p("tools/#{@name}")
+        write_file("tools/#{@name}/#{@name}.c", tools)
+
+        create_dir("mrblib")
+        write_file("mrblib/#{@name}.rb", mrblib)
+
+        create_dir("bintest")
         write_file("bintest/#{@name}.rb", bintest)
-        Dir.mkdir("test") unless Dir.exist?("test")
+
+        create_dir("test")
         write_file("test/test_#{@name}.rb", test)
       end
     end
 
     private
+    def create_dir_p(dir)
+      dir.split("/").inject("") do |parent, base|
+        new_dir =
+          if parent == ""
+            base
+          else
+            "#{parent}/#{base}"
+          end
+
+        create_dir(new_dir)
+
+        new_dir
+      end
+    end
+
+    def create_dir(dir)
+      if Dir.exist?(dir)
+        @output.puts "  skip    #{dir}"
+      else
+        @output.puts "  create  #{dir}/"
+        Dir.mkdir(dir)
+      end
+    end
+
     def write_file(file, contents)
       @output.puts "  create  #{file}"
       File.open(file, 'w') {|file| file.puts contents }

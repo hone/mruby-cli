@@ -1,4 +1,4 @@
-module MrubyCli
+module MRubyCLI
   class Util
     class << self
       def camelize(string)

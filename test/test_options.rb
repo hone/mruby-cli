@@ -1,4 +1,4 @@
-module MrubyCli
+module MRubyCLI
   class TestOptions < MTest::Unit::TestCase
     def test_add
       options = Options.new

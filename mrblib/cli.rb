@@ -1,4 +1,4 @@
-module MrubyCli
+module MRubyCLI
   class CLI
     def initialize(argv, output_io = $stdout, error_io = $stderr)
       @options = setup_options

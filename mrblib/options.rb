@@ -1,4 +1,4 @@
-module MrubyCli
+module MRubyCLI
   class Options
     attr_reader :short_opts, :long_opts
     attr_writer :parsed_opts

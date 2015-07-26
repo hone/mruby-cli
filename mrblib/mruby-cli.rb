@@ -1,3 +1,3 @@
 def __main__(argv)
-  MrubyCli::CLI.new(argv).run
+  MRubyCLI::CLI.new(argv).run
 end

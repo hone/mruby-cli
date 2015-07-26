@@ -1,4 +1,4 @@
-module MrubyCli
+module MRubyCLI
   class TestOption < MTest::Unit::TestCase
     def test_to_long_opt_true
       option = Option.new("setup", "s", true)

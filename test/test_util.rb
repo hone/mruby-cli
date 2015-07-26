@@ -1,4 +1,4 @@
-module MrubyCli
+module MRubyCLI
   class TestUtil < MTest::Unit::TestCase
     def test_camelize
       assert_equal "GoodNightMoon", Util.camelize("good_night_moon")

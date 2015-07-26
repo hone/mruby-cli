@@ -1,4 +1,4 @@
-module MrubyCli
+module MRubyCLI
   class Help
     def initialize(output_io)
       @output_io = output_io

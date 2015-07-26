@@ -1,4 +1,4 @@
-module MrubyCli
+module MRubyCLI
   class Setup
     def initialize(name, output)
       @name   = name

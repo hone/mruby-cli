@@ -65,7 +65,7 @@ MRuby::Gem::Specification.new('hello_world') do |spec|
 end
 ```
 ### CLI Architecture
-The app is built from two parts a C wrapper in `tools/` and a mruby part in `mrblib/`. The C wrapper is fairly minimal and executes the `__main__` method in mruby and instantiates ARGV and passes it to the mruby code. The rest of the CLI is written in mruby. You can't have subfolders in `mrblib/` but you can have as many files in `mrblib/`. All these files are precompiled into mruby bytecode The build tool for mruby is written in CRuby (MRI).
+The app is built from two parts a C wrapper in `tools/` and a mruby part in `mrblib/`. The C wrapper is fairly minimal and executes the `__main__` method in mruby and instantiates `ARGV` and passes it to the mruby code. You won't need to touch the C wrapper. The rest of the CLI is written in mruby. You can't have subfolders in `mrblib/` but you can have as many files in `mrblib/`. All these files are precompiled into mruby bytecode The build tool for mruby is written in CRuby (MRI).
 
 ### Testing
 By default, `mruby-cli` generates two kinds of tests: mtest and bintest.

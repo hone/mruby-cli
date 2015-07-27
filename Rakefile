@@ -64,3 +64,29 @@ desc "cleanup"
 task :clean do
   sh "cd #{MRUBY_ROOT} && rake deep_clean"
 end
+
+desc "generate a release tarball"
+task :release do
+  require 'tmpdir'
+  require 'fileutils'
+  require_relative 'mrblib/version'
+
+  # since we're in the mruby/
+  release_dir = Dir.pwd + "/../releases"
+  FileUtils.mkdir_p(release_dir)
+
+  Dir.mktmpdir do |tmp_dir|
+    Dir.chdir(tmp_dir) do
+      MRuby.each_target do |target|
+        bin = "#{build_dir}/bin/#{exefile(APP_NAME)}"
+        FileUtils.mkdir_p(name)
+        FileUtils.cp(bin, name)
+        FileUtils.mv("host", "x86_64-pc-linux-gnu") if name == "host"
+      end
+
+      release_file = "mruby-cli-#{MRubyCLI::Version::VERSION}.tgz"
+      puts "Writing releases/#{release_file}"
+      `tar czf #{release_dir}/#{release_file} *`
+    end
+  end
+end

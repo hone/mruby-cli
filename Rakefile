@@ -72,21 +72,32 @@ task :release do
   require_relative 'mrblib/version'
 
   # since we're in the mruby/
-  release_dir = Dir.pwd + "/../releases"
-  FileUtils.mkdir_p(release_dir)
+  release_dir  = "releases/v#{MRubyCLI::Version::VERSION}"
+  release_path = Dir.pwd + "/../#{release_dir}"
+  app_name     = "mruby-cli-#{MRubyCLI::Version::VERSION}"
+  FileUtils.mkdir_p(release_path)
 
   Dir.mktmpdir do |tmp_dir|
     Dir.chdir(tmp_dir) do
       MRuby.each_target do |target|
-        bin = "#{build_dir}/bin/#{exefile(APP_NAME)}"
+        arch = name
+        bin  = "#{build_dir}/bin/#{exefile(APP_NAME)}"
         FileUtils.mkdir_p(name)
         FileUtils.cp(bin, name)
-        FileUtils.mv("host", "x86_64-pc-linux-gnu") if name == "host"
+        if name == "host"
+          arch = "x86_64-pc-linux-gnu"
+          FileUtils.mv("host", arch)
+        end
+
+        Dir.chdir(arch) do
+          arch_release = "#{app_name}-#{arch}"
+          puts "Writing #{release_dir}/#{arch_release}.tgz"
+          `tar czf #{release_path}/#{arch_release}.tgz *`
+        end
       end
 
-      release_file = "mruby-cli-#{MRubyCLI::Version::VERSION}.tgz"
-      puts "Writing releases/#{release_file}"
-      `tar czf #{release_dir}/#{release_file} *`
+      puts "Writing #{release_dir}/#{app_name}.tgz"
+      `tar czf #{release_path}/#{app_name}.tgz *`
     end
   end
 end

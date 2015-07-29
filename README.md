@@ -38,6 +38,16 @@ root@3da278e931fc:/home/mruby/code# mruby/build/host/bin/hello_world
 Hello World
 ```
 
+## Docker
+
+Each app will be generated with a Dockerfile that inherits a base image.
+
+You can pull the image from docker hub here:
+https://registry.hub.docker.com/u/hone/mruby-cli/
+
+The Dockerfile for the base image is available on github:
+https://github.com/hone/mruby-cli-docker
+
 ## Hello World
 
 Building the canonical hello world example in mruby-cli is quite simple. The two files of note from the generate skeleton are `mrblib/hello_world.rb` and `mrbgem.rake`. The CLI hooks into the `__main__` method defined here and passes all the arguments as `argv`.

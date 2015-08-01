@@ -62,7 +62,7 @@ task :test => ['test:bintest', 'test:mtest']
 
 desc "cleanup"
 task :clean do
-  sh "cd #{MRUBY_ROOT} && rake deep_clean"
+  sh "rake deep_clean"
 end
 
 desc "generate a release tarball"

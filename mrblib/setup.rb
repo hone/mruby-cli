@@ -318,15 +318,13 @@ namespace :test do
   # only build mtest for host
   task :mtest => [:compile] + MRuby.targets.values.map {|t| t.build_mrbtest_lib_only? ? nil : t.exefile("\#{t.build_dir}/test/mrbtest") }.compact do
     # mruby-io tests expect to be in MRUBY_ROOT
-    Dir.chdir(MRUBY_ROOT) do
-      # in order to get mruby/test/t/synatx.rb __FILE__ to pass,
-      # we need to make sure the tests are built relative from MRUBY_ROOT
-      load "\#{MRUBY_ROOT}/test/mrbtest.rake"
-      MRuby.each_target do |target|
-        # only run unit tests here
-        target.enable_bintest = false
-        run_test unless build_mrbtest_lib_only?
-      end
+    # in order to get mruby/test/t/synatx.rb __FILE__ to pass,
+    # we need to make sure the tests are built relative from MRUBY_ROOT
+    load "\#{MRUBY_ROOT}/test/mrbtest.rake"
+    MRuby.each_target do |target|
+      # only run unit tests here
+      target.enable_bintest = false
+      run_test unless build_mrbtest_lib_only?
     end
   end
 
@@ -358,7 +356,7 @@ task :test => ["test:mtest", "test:bintest"]
 
 desc "cleanup"
 task :clean do
-  sh "cd \#{MRUBY_ROOT} && rake deep_clean"
+  sh "rake deep_clean"
 end
 RAKEFILE
     end

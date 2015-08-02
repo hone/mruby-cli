@@ -21,3 +21,6 @@ shell:
 release:
   <<: *defaults
   command: rake release
+package:
+  <<: *defaults
+  command: rake package

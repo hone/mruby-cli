@@ -308,7 +308,7 @@ load "\#{mruby_root}/Rakefile"
 
 desc "compile binary"
 task :compile => [:mruby, :all] do
-  %W(\#{MRUBY_ROOT}/build/host/bin/\#{APP_NAME} \#{MRUBY_ROOT}/build/i686-pc-linux-gnu/\#{APP_NAME}").each do |bin|
+  %W(\#{mruby_root}/build/host/bin/\#{APP_NAME} \#{mruby_root}/build/i686-pc-linux-gnu/\#{APP_NAME}").each do |bin|
     sh "strip --strip-unneeded \#{bin}" if File.exist?(bin)
   end
 end
@@ -317,10 +317,10 @@ namespace :test do
   desc "run mruby & unit tests"
   # only build mtest for host
   task :mtest => [:compile] + MRuby.targets.values.map {|t| t.build_mrbtest_lib_only? ? nil : t.exefile("\#{t.build_dir}/test/mrbtest") }.compact do
-    # mruby-io tests expect to be in MRUBY_ROOT
+    # mruby-io tests expect to be in mruby_root
     # in order to get mruby/test/t/synatx.rb __FILE__ to pass,
-    # we need to make sure the tests are built relative from MRUBY_ROOT
-    load "\#{MRUBY_ROOT}/test/mrbtest.rake"
+    # we need to make sure the tests are built relative from mruby_root
+    load "\#{mruby_root}/test/mrbtest.rake"
     MRuby.each_target do |target|
       # only run unit tests here
       target.enable_bintest = false

@@ -1,7 +1,7 @@
 # mruby CLI
 A utility for setting up a CLI with [mruby](https://www.mruby.org) that compiles binaries to Linux, OS X, and Windows.
 
-## Prequisites
+## Prerequisites
 You'll need the following installed and in your `PATH`:
 
 * [mruby-cli](https://github.com/hone/mruby-cli/releases)

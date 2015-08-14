@@ -107,3 +107,31 @@ task :release => :compile do
     end
   end
 end
+
+namespace :local do
+  desc "show help"
+  task :version do
+    require_relative 'mrblib/mruby-cli/version'
+    puts "mruby-cli #{MRubyCLI::Version::VERSION}"
+  end
+end
+
+def is_in_a_docker_container?
+  `grep -q docker /proc/self/cgroup`
+  $?.success?
+end
+
+Rake.application.tasks.each do |task|
+  next if ENV["MRUBY_CLI_LOCAL"]
+  unless task.name.start_with?("local:")
+    # Inspired by rake-hooks
+    # https://github.com/guillermo/rake-hooks
+    old_task = Rake.application.instance_variable_get('@tasks').delete(task.name)
+    desc old_task.full_comment
+    task old_task.name => old_task.prerequisites do
+      abort("Not running in docker, you should type \"docker-compose run <task>\".") \
+        unless is_in_a_docker_container?
+      old_task.invoke
+    end
+  end
+end

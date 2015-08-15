@@ -99,4 +99,25 @@ $ docker-compose run bintest
 * [mruby-eso-research](https://github.com/hone/mruby-eso-research) - an app for managing crafting research in Elder Scrolls Online. It uses YAML as the data store.
 
 ## mruby-cli Development
-This app is built as a mruby-cli app, so you just need to run: `docker-compose run compile` and find the binaries in the appropriate directories.
+
+### Compile the mruby-cli binaries
+
+This app is built as a `mruby-cli` app. To compile the binaries, you **must** type
+
+```
+docker-compose run compile
+```
+
+and find the binaries in the appropriate directories (`mruby/build/<target>/bin/`).
+
+The docker container contains the necessary cross toolchain to compile a binary for each supported target. That's why it is checked before running a rake task if it is run inside a container.
+
+Indeed, just using `rake compile` will not work out of the box because the main build is designed to compile on a 64-bit Linux host. It could work if you are on a 64-Linux host and you have an cross toolchain equivalent to the one we provide into the docker container.
+
+This means that if you want to add a new rake task `my_task`, you need to add it to the `docker-compose.yml` to make it available through `docker-compose run my_task`.
+
+### Create the releases
+
+Just type: `rake release`
+
+After this command finishes, you'll see the releases for each target in the `releases` directory.

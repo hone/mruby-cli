@@ -15,7 +15,7 @@ load "#{mruby_root}/Rakefile"
 
 desc "compile all the binaries"
 task :compile => [:all] do
-  %W(#{mruby_root}/build/host/bin/#{APP_NAME} #{mruby_root}/build/i686-pc-linux-gnu/#{APP_NAME}").each do |bin|
+  %W(#{mruby_root}/build/x86_64-pc-linux-gnu/bin/#{APP_NAME} #{mruby_root}/build/i686-pc-linux-gnu/#{APP_NAME}").each do |bin|
     sh "strip --strip-unneeded #{bin}" if File.exist?(bin)
   end
 end
@@ -80,14 +80,12 @@ task :release do
   Dir.mktmpdir do |tmp_dir|
     Dir.chdir(tmp_dir) do
       MRuby.each_target do |target|
+        next if name == "host"
+
         arch = name
         bin  = "#{build_dir}/bin/#{exefile(APP_NAME)}"
         FileUtils.mkdir_p(name)
         FileUtils.cp(bin, name)
-        if name == "host"
-          arch = "x86_64-pc-linux-gnu"
-          FileUtils.mv("host", arch)
-        end
 
         Dir.chdir(arch) do
           arch_release = "#{app_name}-#{arch}"

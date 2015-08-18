@@ -119,6 +119,15 @@ MRuby::Build.new do |conf|
   toolchain :clang
 
   conf.enable_bintest
+  conf.enable_debug
+
+  gem_config(conf)
+end
+
+MRuby::Build.new('x86_64-pc-linux-gnu') do |conf|
+  toolchain :gcc
+
+  conf.build_mrbtest_lib_only
 
   gem_config(conf)
 end
@@ -303,7 +312,7 @@ load "\#{mruby_root}/Rakefile"
 
 desc "compile binary"
 task :compile => [:all] do
-  %W(\#{mruby_root}/build/host/bin/\#{APP_NAME} \#{mruby_root}/build/i686-pc-linux-gnu/\#{APP_NAME}").each do |bin|
+  %W(\#{mruby_root}/build/x86_64-pc-linux-gnu/bin/\#{APP_NAME} \#{mruby_root}/build/i686-pc-linux-gnu/\#{APP_NAME}").each do |bin|
     sh "strip --strip-unneeded \#{bin}" if File.exist?(bin)
   end
 end

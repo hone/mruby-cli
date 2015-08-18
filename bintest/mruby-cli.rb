@@ -40,6 +40,8 @@ assert('setup can compile and run the generated app') do
 
         output, status = Open3.capture2("rake test:mtest")
         assert_true status.success?, "Process did not exit cleanly"
+        assert_false output.include?("Error:"), "mtest has errors"
+        assert_false output.include?("Failure:"), "mtest has failures"
       end
     end
   end

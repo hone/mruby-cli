@@ -35,6 +35,11 @@ assert('setup can compile and run the generated app') do
         assert_true status.success?, "Process did not exit cleanly"
         assert_include output, "Hello World"
 
+        %w(x86_64-pc-linux-gnu i686-pc-linux-gnu).each do |host|
+          output, status = Open3.capture2("file mruby/build/x86_64-pc-linux-gnu/bin/#{app_name}")
+          assert_include output, ", stripped"
+        end
+
         output, status = Open3.capture2("rake test:bintest")
         assert_true status.success?, "Process did not exit cleanly"
 

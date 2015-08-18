@@ -302,7 +302,7 @@ Dir.chdir(mruby_root)
 load "\#{mruby_root}/Rakefile"
 
 desc "compile binary"
-task :compile => [:mruby, :all] do
+task :compile => [:all] do
   %W(\#{mruby_root}/build/host/bin/\#{APP_NAME} \#{mruby_root}/build/i686-pc-linux-gnu/\#{APP_NAME}").each do |bin|
     sh "strip --strip-unneeded \#{bin}" if File.exist?(bin)
   end

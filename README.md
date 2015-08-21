@@ -118,6 +118,6 @@ This means that if you want to add a new rake task `my_task`, you need to add it
 
 ### Create the releases
 
-Just type: `rake release`
+Just type: `docker-compose run release`
 
 After this command finishes, you'll see the releases for each target in the `releases` directory.

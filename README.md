@@ -23,7 +23,7 @@ $ docker-compose run compile
 
 You'll be able to find the binaries in the following directories:
 
-* Linux (64-bit): `mruby/build/x86_64-pc-linux/bin`
+* Linux (64-bit): `mruby/build/x86_64-pc-linux-gnu/bin`
 * Linux (32-bit): `mruby/build/i686-pc-linux-gnu/bin`
 * OS X (64-bit): `mruby/build/x86_64-apple-darwin14/bin/`
 * OS X (32-bit): `mruby/build/i386-apple-darwin14/bin`

@@ -1,4 +1,6 @@
 # mruby CLI
+
+[![Join the chat at https://gitter.im/hone/mruby-cli](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hone/mruby-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A utility for setting up a CLI with [mruby](https://www.mruby.org) that compiles binaries to Linux, OS X, and Windows.
 
 ## Prerequisites

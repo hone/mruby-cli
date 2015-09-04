@@ -68,7 +68,7 @@ desc "generate a release tarball"
 task :release do
   require 'tmpdir'
   require 'fileutils'
-  require_relative 'mrblib/version'
+  require_relative 'mrblib/mruby-cli/version'
 
   # since we're in the mruby/
   release_dir  = "releases/v#{MRubyCLI::Version::VERSION}"

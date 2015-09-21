@@ -10,6 +10,7 @@ MRuby::Build.new do |conf|
 
   conf.enable_bintest
   conf.enable_debug
+  conf.enable_test
 
   gem_config(conf)
 end

@@ -31,7 +31,7 @@ module MRubyCLI
 
       return nil unless option
       if retn = @parsed_opts[option.long]
-        if option.value 
+        if option.value
           return retn unless retn.empty?
         else
           return retn

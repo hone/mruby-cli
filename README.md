@@ -8,6 +8,8 @@ You'll need the following installed and in your `PATH`:
 * [Docker](https://docs.docker.com/installation/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
+On Mac OS X and Windows, [Docker Toolbox](https://www.docker.com/toolbox) is the recommended way to install Docker and docker-compose (does not work on windows).
+
 ## Building a CLI app
 To generate a new mruby CLI, there's a `--setup` option.
 

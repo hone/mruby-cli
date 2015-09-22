@@ -21,6 +21,9 @@ module MRubyCLI
         create_dir("mrblib")
         write_file("mrblib/#{@name}.rb", mrblib)
 
+        create_dir("mrblib/#{@name}")
+        write_file("mrblib/#{@name}/version.rb", version)
+
         create_dir("bintest")
         write_file("bintest/#{@name}.rb", bintest)
 
@@ -82,6 +85,13 @@ assert('hello') do
 
   assert_true status.success?, "Process did not exit cleanly"
   assert_include output, "Hello World"
+end
+
+assert('version') do
+  output, status = Open3.capture2(BIN_PATH, "version")
+
+  assert_true status.success?, "Process did not exit cleanly"
+  assert_include output, "v0.0.1"
 end
 BINTEST
     end
@@ -246,9 +256,21 @@ TOOLS
     def mrblib
       <<TOOLS
 def __main__(argv)
-  puts "Hello World"
+  if argv[1] == "version"
+    puts "v\#{#{Util.camelize(@name)}::VERSION}"
+  else
+    puts "Hello World"
+  end
 end
 TOOLS
+    end
+
+    def version
+      <<VERSION
+module #{Util.camelize(@name)}
+  VERSION = "0.0.1"
+end
+VERSION
     end
 
     def dockerfile

@@ -7,7 +7,7 @@ assert('setup') do
   Dir.mktmpdir do |tmp_dir|
     Dir.chdir(tmp_dir) do
       app_name = "new_cli"
-      output, status = Open3.capture2("#{BIN_PATH}", "--setup", app_name)
+      output, status = Open3.capture2(BIN_PATH, "--setup", app_name)
 
       assert_true status.success?, "Process did not exit cleanly"
       assert_true Dir.exist?(app_name)
@@ -25,7 +25,7 @@ assert('setup can compile and run the generated app') do
   Dir.mktmpdir do |tmp_dir|
     Dir.chdir(tmp_dir) do
       app_name = "hello_world"
-      Open3.capture2("#{BIN_PATH}", "--setup", app_name)
+      Open3.capture2(BIN_PATH, "--setup", app_name)
 
       Dir.chdir(app_name) do
         output, status = Open3.capture2("rake compile")
@@ -54,13 +54,13 @@ end
 
 assert('version') do
   require_relative '../mrblib/mruby-cli/version'
-  output, status = Open3.capture2("#{BIN_PATH}", "--version")
+  output, status = Open3.capture2(BIN_PATH, "--version")
   assert_true status.success?, "Process did not exit cleanly"
   assert_include output, "mruby-cli version #{MRubyCLI::Version::VERSION}"
 end
 
 assert('help') do
-  output, status = Open3.capture2("#{BIN_PATH}", "--help")
+  output, status = Open3.capture2(BIN_PATH, "--help")
   assert_true status.success?, "Process did not exit cleanly"
   assert_include output, "mruby-cli [switches] [arguments]"
 end

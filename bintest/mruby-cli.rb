@@ -29,10 +29,10 @@ assert('setup can compile and run the generated app') do
 
       Dir.chdir(app_name) do
         output, status = Open3.capture2("rake compile")
-        assert_true status.success?, "Process did not exit cleanly"
+        assert_true status.success?, "`rake compile` did not exit cleanly"
 
         output, status = Open3.capture2("mruby/bin/#{app_name}")
-        assert_true status.success?, "Process did not exit cleanly"
+        assert_true status.success?, "`#{app_name}` did not exit cleanly"
         assert_include output, "Hello World"
 
         %w(x86_64-pc-linux-gnu i686-pc-linux-gnu).each do |host|
@@ -41,10 +41,10 @@ assert('setup can compile and run the generated app') do
         end
 
         output, status = Open3.capture2("rake test:bintest")
-        assert_true status.success?, "Process did not exit cleanly"
+        assert_true status.success?, "`rake test:bintest` did not exit cleanly"
 
         output, status = Open3.capture2("rake test:mtest")
-        assert_true status.success?, "Process did not exit cleanly"
+        assert_true status.success?, "`rake test:mtest` did not exit cleanly"
         assert_false output.include?("Error:"), "mtest has errors"
         assert_false output.include?("Failure:"), "mtest has failures"
       end

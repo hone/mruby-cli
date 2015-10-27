@@ -7,5 +7,5 @@ MRuby::Gem::Specification.new('mruby-cli') do |spec|
   spec.add_dependency 'mruby-io',      :mgem => 'mruby-io'
   spec.add_dependency 'mruby-getopts', :mgem => 'mruby-getopts'
   spec.add_dependency 'mruby-dir',     :mgem => 'mruby-dir'
-  spec.add_dependency 'mruby-mtest',   :mgem => 'mruby-mtest'
+  spec.add_dependency 'mruby-docopt',  :github => 'hone/mruby-docopt'
 end

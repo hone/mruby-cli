@@ -1,1 +1,1 @@
-FROM hone/mruby-cli
+FROM hone/mruby-cli:15.04

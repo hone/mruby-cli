@@ -25,13 +25,14 @@ assert('setup can compile and run the generated app') do
   Dir.mktmpdir do |tmp_dir|
     Dir.chdir(tmp_dir) do
       app_name = "hello_world"
+      APP_PATH = File.join("mruby/bin/#{app_name}")
       Open3.capture2(BIN_PATH, "--setup", app_name)
 
       Dir.chdir(app_name) do
         output, status = Open3.capture2("rake compile")
         assert_true status.success?, "`rake compile` did not exit cleanly"
 
-        output, status = Open3.capture2("mruby/bin/#{app_name}")
+        output, status = Open3.capture2(APP_PATH)
         assert_true status.success?, "`#{app_name}` did not exit cleanly"
         assert_include output, "Hello World"
 

@@ -71,7 +71,7 @@ task :clean do
 end
 
 desc "generate a release tarball"
-task :release do
+task :release => :compile do
   require 'tmpdir'
   require_relative 'mrblib/mruby-cli/version'
 

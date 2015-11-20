@@ -21,6 +21,10 @@ load "#{mruby_root}/Rakefile"
 
 desc "compile all the binaries"
 task :compile => [:all] do
+  MRuby.each_target do |target|
+    `#{target.cc.command} --version`
+    abort("Command #{target.cc.command} for #{target.name} is missing.") unless $?.success?
+  end
   %W(#{mruby_root}/build/x86_64-pc-linux-gnu/bin/#{APP_NAME} #{mruby_root}/build/i686-pc-linux-gnu/#{APP_NAME}").each do |bin|
     sh "strip --strip-unneeded #{bin}" if File.exist?(bin)
   end
@@ -100,6 +104,34 @@ task :release => :compile do
 
       puts "Writing #{release_dir}/#{app_name}.tgz"
       `tar czf #{release_path}/#{app_name}.tgz *`
+    end
+  end
+end
+
+namespace :local do
+  desc "show help"
+  task :version do
+    require_relative 'mrblib/mruby-cli/version'
+    puts "mruby-cli #{MRubyCLI::Version::VERSION}"
+  end
+end
+
+def is_in_a_docker_container?
+  `grep -q docker /proc/self/cgroup`
+  $?.success?
+end
+
+Rake.application.tasks.each do |task|
+  next if ENV["MRUBY_CLI_LOCAL"]
+  unless task.name.start_with?("local:")
+    # Inspired by rake-hooks
+    # https://github.com/guillermo/rake-hooks
+    old_task = Rake.application.instance_variable_get('@tasks').delete(task.name)
+    desc old_task.full_comment
+    task old_task.name => old_task.prerequisites do
+      abort("Not running in docker, you should type \"docker-compose run <task>\".") \
+        unless is_in_a_docker_container?
+      old_task.invoke
     end
   end
 end

@@ -125,3 +125,14 @@ This means that if you want to add a new rake task `my_task`, you need to add it
 Just type: `docker-compose run release`
 
 After this command finishes, you'll see the releases for each target in the `releases` directory.
+
+### Create package
+
+We can package the ad hoc release as deb, rpm, msi, or dmg for the following
+Linux.
+
+To create all the package, just type
+
+```
+docker-compose run package
+```

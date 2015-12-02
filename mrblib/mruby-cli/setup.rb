@@ -100,16 +100,16 @@ BINTEST
       <<MRBGEM_RAKE
 require_relative 'mrblib/#{@name}/version'
 
-MRuby::Gem::Specification.new('#{@name}') do |spec|
-  spec.license = 'MIT'
-  spec.author  = 'MRuby Developer'
-  spec.summary = '#{@name}'
+spec = MRuby::Gem::Specification.new('#{@name}') do |spec|
   spec.bins    = ['#{@name}']
-  spec.version = #{Util.camelize(@name)}::VERSION
-
   spec.add_dependency 'mruby-print', :core => 'mruby-print'
   spec.add_dependency 'mruby-mtest', :mgem => 'mruby-mtest'
 end
+
+spec.license = 'MIT'
+spec.author  = 'MRuby Developer'
+spec.summary = '#{@name}'
+spec.version = #{Util.camelize(@name)}::VERSION
 MRBGEM_RAKE
     end
 
@@ -304,6 +304,9 @@ clean:
 shell:
   <<: *defaults
   command: bash
+release:
+  <<: *defaults
+  command: rake release
 DOCKER_COMPOSE_YML
     end
 
@@ -329,6 +332,13 @@ ENV['MRUBY_CONFIG'] = mruby_config
 Rake::Task[:mruby].invoke unless Dir.exist?(mruby_root)
 Dir.chdir(mruby_root)
 load "\#{mruby_root}/Rakefile"
+
+
+load File.join(File.expand_path(File.dirname(__FILE__)), "mrbgem.rake")
+
+current_gem = MRuby::Gem.current
+app_version = MRuby::Gem.current.version
+APP_VERSION = (app_version.nil? || app_version.empty?) ? "unknown" : app_version
 
 desc "compile binary"
 task :compile => [:all] do
@@ -386,11 +396,43 @@ task :clean do
   sh "rake deep_clean"
 end
 
+desc "generate a release tarball"
+task :release => :compile do
+  require 'tmpdir'
+
+  # since we're in the mruby/
+  release_dir  = "releases/v\#{APP_VERSION}"
+  release_path = Dir.pwd + "/../\#{release_dir}"
+  app_name     = "\#{APP_NAME}-\#{APP_VERSION}"
+  FileUtils.mkdir_p(release_path)
+
+  Dir.mktmpdir do |tmp_dir|
+    Dir.chdir(tmp_dir) do
+      MRuby.each_target do |target|
+        next if name == "host"
+
+        arch = name
+        bin  = "\#{build_dir}/bin/\#{exefile(APP_NAME)}"
+        FileUtils.mkdir_p(name)
+        FileUtils.cp(bin, name)
+
+        Dir.chdir(arch) do
+          arch_release = "\#{app_name}-\#{arch}"
+          puts "Writing \#{release_dir}/\#{arch_release}.tgz"
+          `tar czf \#{release_path}/\#{arch_release}.tgz *`
+        end
+      end
+
+      puts "Writing \#{release_dir}/\#{app_name}.tgz"
+      `tar czf \#{release_path}/\#{app_name}.tgz *`
+    end
+  end
+end
+
 namespace :local do
-  desc "show help"
+  desc "show version"
   task :version do
-    require_relative 'mrblib/mruby-cli/version'
-    puts "mruby-cli \#{MRubyCLI::Version::VERSION}"
+    puts "\#{APP_NAME} \#{APP_VERSION}"
   end
 end
 

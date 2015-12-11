@@ -98,11 +98,14 @@ BINTEST
 
     def mrbgem_rake
       <<MRBGEM_RAKE
+require_relative 'mrblib/#{@name}/version'
+
 MRuby::Gem::Specification.new('#{@name}') do |spec|
   spec.license = 'MIT'
   spec.author  = 'MRuby Developer'
   spec.summary = '#{@name}'
   spec.bins    = ['#{@name}']
+  spec.version = #{Util.camelize(@name)}::VERSION
 
   spec.add_dependency 'mruby-print', :core => 'mruby-print'
   spec.add_dependency 'mruby-mtest', :mgem => 'mruby-mtest'

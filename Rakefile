@@ -114,6 +114,24 @@ namespace :local do
     require_relative 'mrblib/mruby-cli/version'
     puts "mruby-cli #{MRubyCLI::Version::VERSION}"
   end
+
+  SUPPORTED_TARGET = {
+    "linux" => "x86_64-pc-linux-gnu",
+    "osx" => "x86_64-apple-darwin14"
+  }
+  def test_bin_for_target(target)
+    abort "target not supported" unless SUPPORTED_TARGET.keys.include? target
+    bin = "./build/#{SUPPORTED_TARGET[target]}/bin/mruby-cli"
+    abort "mruby for target #{target} absent!" unless File.exists? bin
+    `#{bin}`
+    abort "#{target} target is not runnable" unless $?.success?
+    puts "#{target} target is working!"
+  end
+
+  desc "test on the current target its corresponding binary"
+  task :test_bin_on_current_target do
+    test_bin_for_target ENV["TRAVIS_OS_NAME"]
+  end
 end
 
 def is_in_a_docker_container?

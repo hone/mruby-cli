@@ -115,22 +115,48 @@ namespace :local do
     puts "mruby-cli #{MRubyCLI::Version::VERSION}"
   end
 
-  SUPPORTED_TARGET = {
-    "linux" => "x86_64-pc-linux-gnu",
-    "osx" => "x86_64-apple-darwin14"
-  }
-  def test_bin_for_target(target)
-    abort "target not supported" unless SUPPORTED_TARGET.keys.include? target
-    bin = "./build/#{SUPPORTED_TARGET[target]}/bin/mruby-cli"
-    abort "mruby for target #{target} absent!" unless File.exists? bin
-    `#{bin}`
-    abort "#{target} target is not runnable" unless $?.success?
-    puts "#{target} target is working!"
+  def clone_mruby_cli_bins
+    Dir.chdir(APP_ROOT) do
+      `git clone git@github.com:toch/mruby-cli-bins.git`
+      return "#{APP_ROOT}/mruby-cli-bins" if $?.success?
+    end
+    nil
   end
 
-  desc "test on the current target its corresponding binary"
-  task :test_bin_on_current_target do
-    test_bin_for_target ENV["TRAVIS_OS_NAME"]
+  def detect_current_branch
+    return nil unless ENV.key? 'TRAVIS'
+    return ENV['TRAVIS_BRANCH'] if ENV['TRAVIS_PULL_REQUEST'] == "false"
+    nil
+  end
+
+  SUPPORTED_TARGET = {
+    "linux" => "x86_64-pc-linux-gnu",
+    "osx" => "x86_64-apple-darwin14",
+    "win" => "x86_64-w64-mingw32"
+  }
+
+  def push_mruby_cli_bins(dir, branch)
+    Dir.chdir(dir) do
+      `git checkout -B #{branch}`
+      SUPPORTED_TARGET.each do |target, dir|
+        bin_dir = "#{APP_ROOT}/mruby/build/#{dir}/bin"
+        bin_file = "mruby-cli"
+        bin_file << ".exe" if target == "win"
+        `cp #{bin_dir}/#{bin_file} #{dir}/bin/`
+        `git add #{dir}/bin/#{bin_file}`
+      end
+      `git commit -m "Travis Build #{ENV['TRAVIS_BUILD_NUMBER']} on branch #{branch}"`
+      `git push origin #{branch}`
+    end
+  end
+
+  desc "prepare the bins and send them to mruby-cli-bins"
+  task :send_bins_for_test do
+    mruby_cli_bins_dir = clone_mruby_cli_bins
+    abort "[send bins for test] impossible to clone mruby-cli-bins" unless mruby_cli_bins_dir
+    current_branch = detect_current_branch
+    abort "[send bins for test] impossible to detect current branch" unless current_branch
+    push_mruby_cli_bins(mruby_cli_bins_dir, current_branch)
   end
 end
 

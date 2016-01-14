@@ -36,6 +36,14 @@ assert('setup can compile and run the generated app') do
         assert_true status.success?, "`#{app_name}` did not exit cleanly"
         assert_include output, "Hello World"
 
+        output, status = Open3.capture2(APP_PATH, "--version")
+        assert_true status.success?, "`#{app_name}` did not exit cleanly when requesting version"
+        assert_include output, "#{app_name} version 0.0.1"
+
+        output, status = Open3.capture2(APP_PATH, "--help")
+        assert_true status.success?, "`#{app_name}` did not exit cleanly when requesting help"
+        assert_include output, "#{app_name} [switches] [arguments]"
+
         %w(x86_64-pc-linux-gnu i686-pc-linux-gnu).each do |host|
           output, status = Open3.capture2("file mruby/build/x86_64-pc-linux-gnu/bin/#{app_name}")
           assert_include output, ", stripped"

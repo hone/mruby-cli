@@ -190,7 +190,7 @@ MRuby::CrossBuild.new('x86_64-w64-mingw32') do |conf|
   [conf.cc, conf.linker].each do |cc|
     cc.command = 'x86_64-w64-mingw32-gcc'
   end
-  conf.cxx.command      = 'x86_64-w64-mingw32-cpp'
+  conf.cxx.command      = 'x86_64-w64-mingw32-g++'
   conf.archiver.command = 'x86_64-w64-mingw32-gcc-ar'
   conf.exts.executable  = ".exe"
 
@@ -206,7 +206,7 @@ MRuby::CrossBuild.new('i686-w64-mingw32') do |conf|
   [conf.cc, conf.linker].each do |cc|
     cc.command = 'i686-w64-mingw32-gcc'
   end
-  conf.cxx.command      = 'i686-w64-mingw32-cpp'
+  conf.cxx.command      = 'i686-w64-mingw32-g++'
   conf.archiver.command = 'i686-w64-mingw32-gcc-ar'
   conf.exts.executable  = ".exe"
 

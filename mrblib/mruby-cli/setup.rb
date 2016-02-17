@@ -8,59 +8,35 @@ module MRubyCLI
     def run
       Dir.mkdir(@name) unless Dir.exist?(@name)
       Dir.chdir(@name) do
-        write_file(".gitignore", gitignore)
-        write_file("mrbgem.rake", mrbgem_rake)
-        write_file("build_config.rb", build_config_rb)
-        write_file("Rakefile", rakefile)
-        write_file("Dockerfile", dockerfile)
-        write_file("docker-compose.yml", docker_compose_yml)
+        Util::write_file(".gitignore", gitignore)
+        Util::write_file("mrbgem.rake", mrbgem_rake)
+        Util::write_file("build_config.rb", build_config_rb)
+        Util::write_file("Rakefile", rakefile)
+        Util::write_file("Dockerfile", dockerfile)
+        Util::write_file("docker-compose.yml", docker_compose_yml)
 
-        create_dir_p("tools/#{@name}")
-        write_file("tools/#{@name}/#{@name}.c", tools)
+        Util::create_dir_p("tools/#{@name}")
+        Util::write_file("tools/#{@name}/#{@name}.c", tools)
 
-        create_dir("mrblib")
-        write_file("mrblib/#{@name}.rb", mrblib)
+        Util::create_dir("mrblib")
+        Util::write_file("mrblib/#{@name}.rb", mrblib)
 
-        create_dir("mrblib/#{@name}")
-        write_file("mrblib/#{@name}/version.rb", version)
+        Util::create_dir("bintest")
+        Util::write_file("bintest/#{@name}.rb", bintest)
 
-        create_dir("bintest")
-        write_file("bintest/#{@name}.rb", bintest)
+        Util::create_dir("test")
+        Util::write_file("test/test_#{@name}.rb", test)
 
-        create_dir("test")
-        write_file("test/test_#{@name}.rb", test)
+        Util::create_dir("mrblib/#{@name}")
+        generate = Generate.new(@name, @output)
+        generate.run(:cli)
+        generate.run(:help)
+        generate.run(:version)
+        generate.run(:options)
       end
     end
 
     private
-    def create_dir_p(dir)
-      dir.split("/").inject("") do |parent, base|
-        new_dir =
-          if parent == ""
-            base
-          else
-            "#{parent}/#{base}"
-          end
-
-        create_dir(new_dir)
-
-        new_dir
-      end
-    end
-
-    def create_dir(dir)
-      if Dir.exist?(dir)
-        @output.puts "  skip    #{dir}"
-      else
-        @output.puts "  create  #{dir}/"
-        Dir.mkdir(dir)
-      end
-    end
-
-    def write_file(file, contents)
-      @output.puts "  create  #{file}"
-      File.open(file, 'w') {|file| file.puts contents }
-    end
 
     def test
       <<TEST
@@ -88,10 +64,10 @@ assert('hello') do
 end
 
 assert('version') do
-  output, status = Open3.capture2(BIN_PATH, "version")
+  output, status = Open3.capture2(BIN_PATH, "--version")
 
   assert_true status.success?, "Process did not exit cleanly"
-  assert_include output, "v0.0.1"
+  assert_include output, "#{@name} version 0.0.1"
 end
 BINTEST
     end
@@ -105,10 +81,11 @@ MRuby::Gem::Specification.new('#{@name}') do |spec|
   spec.author  = 'MRuby Developer'
   spec.summary = '#{@name}'
   spec.bins    = ['#{@name}']
-  spec.version = #{Util.camelize(@name)}::VERSION
+  spec.version = #{Util.camelize(@name)}::Version::VERSION
 
   spec.add_dependency 'mruby-print', :core => 'mruby-print'
   spec.add_dependency 'mruby-mtest', :mgem => 'mruby-mtest'
+  spec.add_dependency 'mruby-getopts', :mgem => 'mruby-getopts'
 end
 MRBGEM_RAKE
     end
@@ -259,21 +236,9 @@ TOOLS
     def mrblib
       <<TOOLS
 def __main__(argv)
-  if argv[1] == "version"
-    puts "v\#{#{Util.camelize(@name)}::VERSION}"
-  else
-    puts "Hello World"
-  end
+  #{Util::camelize(@name)}::CLI.new(argv).run
 end
 TOOLS
-    end
-
-    def version
-      <<VERSION
-module #{Util.camelize(@name)}
-  VERSION = "0.0.1"
-end
-VERSION
     end
 
     def dockerfile

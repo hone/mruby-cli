@@ -12,6 +12,7 @@ MRuby::Build.new do |conf|
   conf.enable_debug
   conf.enable_test
   conf.enable_cxx_abi
+  conf.linker.flags << "-static-libstdc++"
 
   gem_config(conf)
 end
@@ -20,6 +21,8 @@ MRuby::Build.new('x86_64-pc-linux-gnu') do |conf|
   toolchain :gcc
 
   conf.enable_cxx_abi
+  conf.linker.flags << "-static-libstdc++"
+
   gem_config(conf)
 end
 
@@ -31,6 +34,8 @@ MRuby::CrossBuild.new('i686-pc-linux-gnu') do |conf|
   end
 
   conf.enable_cxx_abi
+  conf.linker.flags << "-static-libstdc++"
+
   gem_config(conf)
 end
 
@@ -61,6 +66,8 @@ MRuby::CrossBuild.new('i386-apple-darwin14') do |conf|
  conf.cxx.command      = 'i386-apple-darwin14-clang++'
  conf.cxx.flags << "-std=c++11 -stdlib=libc++"
  conf.linker.flags << "-std=c++11 -stdlib=libc++"
+ conf.linker.flags << "-static-libstdc++"
+
  conf.archiver.command = 'i386-apple-darwin14-ar'
 
  conf.build_target     = 'i386-pc-linux-gnu'
@@ -84,6 +91,7 @@ MRuby::CrossBuild.new('x86_64-w64-mingw32') do |conf|
  conf.host_target      = 'x86_64-w64-mingw32'
 
  conf.enable_cxx_abi
+ conf.linker.flags << "-static-libstdc++"
  gem_config(conf)
 end
 
@@ -101,5 +109,6 @@ MRuby::CrossBuild.new('i686-w64-mingw32') do |conf|
  conf.host_target      = 'i686-w64-mingw32'
 
  conf.enable_cxx_abi
+ conf.linker.flags << "-static-libstdc++"
  gem_config(conf)
 end

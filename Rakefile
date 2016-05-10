@@ -8,11 +8,19 @@ end
 
 APP_NAME=ENV["APP_NAME"] || "mruby-cli"
 APP_ROOT=ENV["APP_ROOT"] || Dir.pwd
+
+def expand_and_set(env_name, default)
+  unexpanded = ENV.fetch env_name, default
+
+  expanded = File.expand_path unexpanded
+
+  ENV[env_name] = expanded
+end
+
 # avoid redefining constants in mruby Rakefile
-mruby_root=File.expand_path(ENV["MRUBY_ROOT"] || "#{APP_ROOT}/mruby")
-mruby_config=File.expand_path(ENV["MRUBY_CONFIG"] || "build_config.rb")
-ENV['MRUBY_ROOT'] = mruby_root
-ENV['MRUBY_CONFIG'] = mruby_config
+mruby_root   = expand_and_set "MRUBY_ROOT", "#{APP_ROOT}/mruby"
+mruby_config = expand_and_set "MRUBY_CONFIG", "build_config.rb"
+
 Rake::Task[:mruby].invoke unless Dir.exist?(mruby_root)
 cd mruby_root
 load "#{mruby_root}/Rakefile"

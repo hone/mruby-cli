@@ -14,7 +14,7 @@ mruby_config=File.expand_path(ENV["MRUBY_CONFIG"] || "build_config.rb")
 ENV['MRUBY_ROOT'] = mruby_root
 ENV['MRUBY_CONFIG'] = mruby_config
 Rake::Task[:mruby].invoke unless Dir.exist?(mruby_root)
-Dir.chdir(mruby_root)
+cd mruby_root
 load "#{mruby_root}/Rakefile"
 
 load File.join(File.expand_path(File.dirname(__FILE__)), "mrbgem.rake")
@@ -89,7 +89,7 @@ task :release => :compile do
   mkdir_p release_path
 
   Dir.mktmpdir do |tmp_dir|
-    Dir.chdir(tmp_dir) do
+    cd tmp_dir do
       MRuby.each_target do |target|
         next if name == "host"
 
@@ -98,7 +98,7 @@ task :release => :compile do
         mkdir_p name
         cp bin, name
 
-        Dir.chdir(arch) do
+        cd arch do
           arch_release = "#{app_name}-#{arch}"
           puts "Writing #{release_dir}/#{arch_release}.tgz"
           `tar czf #{release_path}/#{arch_release}.tgz *`
@@ -285,7 +285,7 @@ source $HOME/.bash_profile
       log(package_dir, version, "mruby-cli-#{version}-#{arch}.msi")
       release_tar_file = "mruby-cli-#{version}-#{arch}-w64-mingw32.tgz"
       Dir.mktmpdir do |dest_dir|
-        Dir.chdir dest_dir
+        cd dest_dir
         `tar -zxf #{release_path}/#{release_tar_file}`
         File.write("mruby-cli-#{version}-#{arch}.wxs", wxs_content(version, arch))
         `wixl -v mruby-cli-#{version}-#{arch}.wxs && mv mruby-cli-#{version}-#{arch}.msi #{package_path}`
@@ -300,7 +300,7 @@ source $HOME/.bash_profile
       log(package_dir, version, "mruby-cli-#{version}-#{arch}.dmg")
       release_tar_file = "mruby-cli-#{version}-#{arch}-apple-darwin14.tgz"
       Dir.mktmpdir do |dest_dir|
-        Dir.chdir dest_dir
+        cd dest_dir
         `tar -zxf #{release_path}/#{release_tar_file}`
         chmod 0755, "mruby-cli"
         mkdir_p "mruby-cli.app/Contents/MacOs"

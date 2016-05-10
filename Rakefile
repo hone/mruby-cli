@@ -29,9 +29,11 @@ load "#{mruby_root}/Rakefile"
 
 load File.join(File.expand_path(File.dirname(__FILE__)), "mrbgem.rake")
 
-current_gem = MRuby::Gem.current
-app_version = MRuby::Gem.current.version
-APP_VERSION = (app_version.nil? || app_version.empty?) ? "unknown" : app_version
+task :app_version do
+  current_gem = MRuby::Gem.current
+  app_version = MRuby::Gem.current.version
+  APP_VERSION = (app_version.nil? || app_version.empty?) ? "unknown" : app_version
+end
 
 desc "compile all the binaries"
 task :compile => [:all] do
@@ -148,6 +150,6 @@ Rake.application.tasks.each do |task|
   end
 end
 
-file "../tasks/package.rake"
+file "../tasks/package.rake" => :app_version
 
 import "../tasks/package.rake"

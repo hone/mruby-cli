@@ -6,8 +6,8 @@ file :mruby do
   mv "mruby-#{MRUBY_VERSION}", "mruby"
 end
 
-APP_NAME=ENV["APP_NAME"] || "mruby-cli"
-APP_ROOT=ENV["APP_ROOT"] || Dir.pwd
+APP_NAME = ENV.fetch "APP_NAME", "mruby-cli"
+APP_ROOT = ENV.fetch "APP_ROOT", Dir.pwd
 
 def expand_and_set(env_name, default)
   unexpanded = ENV.fetch env_name, default

@@ -7,7 +7,7 @@ namespace :package do
   release_path = File.expand_path "releases/v#{APP_VERSION}"
   package_path = File.expand_path "packages/v#{APP_VERSION}"
 
-  mkdir_p package_path
+  directory package_path
 
   def check_fpm_installed?
     `gem list -i fpm`.chomp == "true"
@@ -116,7 +116,7 @@ source $HOME/.bash_profile
   end
 
   desc "create deb package"
-  task :deb => [:release] do
+  task :deb => [package_path, :release] do
     abort("fpm is not installed. Please check your docker install.") unless check_fpm_installed?
 
     ["x86_64", "i686"].each do |arch|
@@ -128,7 +128,7 @@ source $HOME/.bash_profile
   end
 
   desc "create rpm package"
-  task :rpm => [:release] do
+  task :rpm => [package_path, :release] do
     abort("fpm is not installed. Please check your docker install.") unless check_fpm_installed?
 
     ["x86_64", "i686"].each do |arch|
@@ -139,7 +139,7 @@ source $HOME/.bash_profile
   end
 
   desc "create msi package"
-  task :msi => [:release] do
+  task :msi => [package_path, :release] do
     abort("msitools is not installed.  Please check your docker install.") unless check_msi_installed?
     ["x86_64", "i686"].each do |arch|
       log(package_dir, APP_VERSION, "mruby-cli-#{APP_VERSION}-#{arch}.msi")
@@ -154,7 +154,7 @@ source $HOME/.bash_profile
   end
 
   desc "create dmg package"
-  task :dmg => [:release] do
+  task :dmg => [package_path, :release] do
     abort("dmg tools are not installed.  Please check your docker install.") unless check_dmg_installed?
     ["x86_64", "i386"].each do |arch|
       log(package_dir, APP_VERSION, "mruby-cli-#{APP_VERSION}-#{arch}.dmg")

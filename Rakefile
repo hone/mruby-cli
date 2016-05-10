@@ -53,10 +53,12 @@ namespace :test do
   task :mtest => :compile do
     # in order to get mruby/test/t/synatx.rb __FILE__ to pass,
     # we need to make sure the tests are built relative from mruby_root
-    MRuby.each_target do |target|
-      # only run unit tests here
-      target.enable_bintest = false
-      run_test if target.test_enabled?
+    cd mruby_root do
+      MRuby.each_target do |target|
+        # only run unit tests here
+        target.enable_bintest = false
+        run_test if target.test_enabled?
+      end
     end
   end
 

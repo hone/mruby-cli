@@ -4,11 +4,10 @@ desc "create all packages"
 task :package => ["package:deb", "package:rpm", "package:msi", "package:dmg"]
 
 namespace :package do
-  release_dir = "releases/v#{APP_VERSION}"
-  package_dir = "packages/v#{APP_VERSION}"
-  release_path = Dir.pwd + "/../#{release_dir}"
-  package_path = Dir.pwd + "/../#{package_dir}"
-  mkdir_p(package_path)
+  release_path = File.expand_path "releases/v#{APP_VERSION}"
+  package_path = File.expand_path "packages/v#{APP_VERSION}"
+
+  mkdir_p package_path
 
   def check_fpm_installed?
     `gem list -i fpm`.chomp == "true"

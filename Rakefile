@@ -23,13 +23,14 @@ end
 
 task :mruby => mruby_root
 
-Rake::Task[:mruby].invoke unless Dir.exist?(mruby_root)
-cd mruby_root
-load "#{mruby_root}/Rakefile"
+mruby_rakefile = "#{mruby_root}/Rakefile"
+file mruby_rakefile => mruby_root
 
-load File.join(File.expand_path(File.dirname(__FILE__)), "mrbgem.rake")
+import mruby_rakefile
 
 task :app_version do
+  load "mrbgem.rake"
+
   current_gem = MRuby::Gem.current
   app_version = MRuby::Gem.current.version
   APP_VERSION = (app_version.nil? || app_version.empty?) ? "unknown" : app_version
@@ -73,9 +74,11 @@ namespace :test do
 
   desc "run integration tests"
   task :bintest => :compile do
-    MRuby.each_target do |target|
-      clean_env(%w(MRUBY_ROOT MRUBY_CONFIG)) do
-        run_bintest if target.bintest_enabled?
+    cd mruby_root do
+      MRuby.each_target do |target|
+        clean_env(%w(MRUBY_ROOT MRUBY_CONFIG)) do
+          run_bintest if target.bintest_enabled?
+        end
       end
     end
   end
@@ -94,9 +97,7 @@ desc "generate a release tarball"
 task :release => :compile do
   require 'tmpdir'
 
-  # since we're in the mruby/
-  release_dir  = "releases/v#{APP_VERSION}"
-  release_path = Dir.pwd + "/../#{release_dir}"
+  release_path = File.expand_path "releases/v#{APP_VERSION}"
   app_name     = "#{APP_NAME}-#{APP_VERSION}"
   mkdir_p release_path
 
@@ -112,12 +113,12 @@ task :release => :compile do
 
         cd arch do
           arch_release = "#{app_name}-#{arch}"
-          puts "Writing #{release_dir}/#{arch_release}.tgz"
+          puts "Writing #{release_path}/#{arch_release}.tgz"
           `tar czf #{release_path}/#{arch_release}.tgz *`
         end
       end
 
-      puts "Writing #{release_dir}/#{app_name}.tgz"
+      puts "Writing #{release_path}/#{app_name}.tgz"
       `tar czf #{release_path}/#{app_name}.tgz *`
     end
   end
@@ -148,6 +149,7 @@ Rake.application.tasks.each do |task|
   task task.name => "local:ensure_in_docker"
 end unless ENV["MRUBY_CLI_LOCAL"]
 
-file "../tasks/package.rake" => :app_version
+file "tasks/package.rake" => :app_version
 
-import "../tasks/package.rake"
+import "tasks/package.rake"
+

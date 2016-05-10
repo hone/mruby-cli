@@ -1,11 +1,9 @@
-require 'fileutils'
-
 MRUBY_VERSION="1.2.0"
 
 file :mruby do
   #sh "git clone --depth=1 https://github.com/mruby/mruby"
   sh "curl -L --fail --retry 3 --retry-delay 1 https://github.com/mruby/mruby/archive/#{MRUBY_VERSION}.tar.gz -s -o - | tar zxf -"
-  FileUtils.mv("mruby-#{MRUBY_VERSION}", "mruby")
+  mv "mruby-#{MRUBY_VERSION}", "mruby"
 end
 
 APP_NAME=ENV["APP_NAME"] || "mruby-cli"
@@ -88,7 +86,7 @@ task :release => :compile do
   release_dir  = "releases/v#{APP_VERSION}"
   release_path = Dir.pwd + "/../#{release_dir}"
   app_name     = "#{APP_NAME}-#{APP_VERSION}"
-  FileUtils.mkdir_p(release_path)
+  mkdir_p release_path
 
   Dir.mktmpdir do |tmp_dir|
     Dir.chdir(tmp_dir) do
@@ -97,8 +95,8 @@ task :release => :compile do
 
         arch = name
         bin  = "#{build_dir}/bin/#{exefile(APP_NAME)}"
-        FileUtils.mkdir_p(name)
-        FileUtils.cp(bin, name)
+        mkdir_p name
+        cp bin, name
 
         Dir.chdir(arch) do
           arch_release = "#{app_name}-#{arch}"
@@ -149,7 +147,7 @@ namespace :package do
   package_dir = "packages/v#{version}"
   release_path = Dir.pwd + "/../#{release_dir}"
   package_path = Dir.pwd + "/../#{package_dir}"
-  FileUtils.mkdir_p(package_path)
+  mkdir_p(package_path)
 
   def check_fpm_installed?
     `gem list -i fpm`.chomp == "true"
@@ -304,12 +302,12 @@ source $HOME/.bash_profile
       Dir.mktmpdir do |dest_dir|
         Dir.chdir dest_dir
         `tar -zxf #{release_path}/#{release_tar_file}`
-        FileUtils.chmod 0755, "mruby-cli"
-        FileUtils.mkdir_p "mruby-cli.app/Contents/MacOs"
-        FileUtils.mv "mruby-cli", "mruby-cli.app/Contents/MacOs"
+        chmod 0755, "mruby-cli"
+        mkdir_p "mruby-cli.app/Contents/MacOs"
+        mv "mruby-cli", "mruby-cli.app/Contents/MacOs"
         File.write("mruby-cli.app/Contents/Info.plist", info_plist_content(version, arch))
         File.write("add-mruby-cli-to-my-path.sh", osx_setup_bash_path_script)
-        FileUtils.chmod 0755, "add-mruby-cli-to-my-path.sh"
+        chmod 0755, "add-mruby-cli-to-my-path.sh"
         `genisoimage -V mruby-cli -D -r -apple -no-pad -o #{package_path}/mruby-cli-#{version}-#{arch}.dmg #{dest_dir}`
       end
     end

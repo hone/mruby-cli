@@ -1,11 +1,5 @@
 MRUBY_VERSION="1.2.0"
 
-file :mruby do
-  #sh "git clone --depth=1 https://github.com/mruby/mruby"
-  sh "curl -L --fail --retry 3 --retry-delay 1 https://github.com/mruby/mruby/archive/#{MRUBY_VERSION}.tar.gz -s -o - | tar zxf -"
-  mv "mruby-#{MRUBY_VERSION}", "mruby"
-end
-
 APP_NAME = ENV.fetch "APP_NAME", "mruby-cli"
 APP_ROOT = ENV.fetch "APP_ROOT", Dir.pwd
 
@@ -20,6 +14,14 @@ end
 # avoid redefining constants in mruby Rakefile
 mruby_root   = expand_and_set "MRUBY_ROOT", "#{APP_ROOT}/mruby"
 mruby_config = expand_and_set "MRUBY_CONFIG", "build_config.rb"
+
+directory mruby_root do
+  #sh "git clone --depth=1 https://github.com/mruby/mruby"
+  sh "curl -L --fail --retry 3 --retry-delay 1 https://github.com/mruby/mruby/archive/#{MRUBY_VERSION}.tar.gz -s -o - | tar zxf -"
+  mv "mruby-#{MRUBY_VERSION}", mruby_root
+end
+
+task :mruby => mruby_root
 
 Rake::Task[:mruby].invoke unless Dir.exist?(mruby_root)
 cd mruby_root

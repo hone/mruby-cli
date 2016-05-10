@@ -123,32 +123,30 @@ task :release => :compile do
   end
 end
 
-namespace :local do
-  desc "show version"
-  task :version do
-    puts "#{APP_NAME} #{APP_VERSION}"
-  end
-end
-
 def is_in_a_docker_container?
   `grep -q docker /proc/self/cgroup`
   $?.success?
 end
 
-Rake.application.tasks.each do |task|
-  next if ENV["MRUBY_CLI_LOCAL"]
-  unless task.name.start_with?("local:")
-    # Inspired by rake-hooks
-    # https://github.com/guillermo/rake-hooks
-    old_task = Rake.application.instance_variable_get('@tasks').delete(task.name)
-    desc old_task.full_comment
-    task old_task.name => old_task.prerequisites do
-      abort("Not running in docker, you should type \"docker-compose run <task>\".") \
-        unless is_in_a_docker_container?
-      old_task.invoke
+namespace :local do
+  desc "show version"
+  task :version do
+    puts "#{APP_NAME} #{APP_VERSION}"
+  end
+
+  task :ensure_in_docker do
+    unless is_in_a_docker_container? then
+      abort "Not running in docker, you should type \"docker-compose run <task>\"."
     end
   end
 end
+
+Rake.application.tasks.each do |task|
+  next if task.name.start_with?("local:")
+  next if Rake::FileTask === task
+
+  task task.name => "local:ensure_in_docker"
+end unless ENV["MRUBY_CLI_LOCAL"]
 
 file "../tasks/package.rake" => :app_version
 

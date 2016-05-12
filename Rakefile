@@ -24,9 +24,13 @@ end
 task :mruby => mruby_root
 
 mruby_rakefile = "#{mruby_root}/Rakefile"
-file mruby_rakefile => mruby_root
 
+file   mruby_rakefile => mruby_root
 import mruby_rakefile
+
+test_rakefile = "tasks/test.rake"
+file   test_rakefile => mruby_rakefile
+import test_rakefile
 
 task :app_version do
   load "mrbgem.rake"
@@ -46,49 +50,6 @@ task :compile => [:all] do
     sh "strip --strip-unneeded #{bin}" if File.exist?(bin)
   end
 end
-
-namespace :test do
-  desc "run mruby & unit tests"
-  # only build mtest for host
-  task :mtest => :compile do
-    # in order to get mruby/test/t/synatx.rb __FILE__ to pass,
-    # we need to make sure the tests are built relative from mruby_root
-    cd mruby_root do
-      MRuby.each_target do |target|
-        # only run unit tests here
-        target.enable_bintest = false
-        run_test if target.test_enabled?
-      end
-    end
-  end
-
-  def clean_env(envs)
-    old_env = {}
-    envs.each do |key|
-      old_env[key] = ENV[key]
-      ENV[key] = nil
-    end
-    yield
-    envs.each do |key|
-      ENV[key] = old_env[key]
-    end
-  end
-
-  desc "run integration tests"
-  task :bintest => :compile do
-    cd mruby_root do
-      MRuby.each_target do |target|
-        clean_env(%w(MRUBY_ROOT MRUBY_CONFIG)) do
-          run_bintest if target.bintest_enabled?
-        end
-      end
-    end
-  end
-end
-
-desc "run all tests"
-Rake::Task['test'].clear
-task :test => ['test:bintest', 'test:mtest']
 
 desc "cleanup"
 task :clean do

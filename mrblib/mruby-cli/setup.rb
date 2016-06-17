@@ -360,11 +360,6 @@ end
 
 desc "compile all the binaries"
 task :compile => [:all] do
-  MRuby.each_target do |target|
-    puts "checking \#{target.cc.command}"
-    `\#{target.cc.command} --version`
-    abort("Command \#{target.cc.command} for \#{target.name} is missing.") unless $?.success?
-  end
   %W(\#{mruby_root}/build/x86_64-pc-linux-gnu/bin/\#{APP_NAME}
      \#{mruby_root}/build/i686-pc-linux-gnu/\#{APP_NAME}").each do |bin|
     puts "impl strip \#{bin}"

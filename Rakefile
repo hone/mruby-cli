@@ -46,7 +46,8 @@ task :compile => [:all] do
     `#{target.cc.command} --version`
     abort("Command #{target.cc.command} for #{target.name} is missing.") unless $?.success?
   end
-  %W(#{mruby_root}/build/x86_64-pc-linux-gnu/bin/#{APP_NAME} #{mruby_root}/build/i686-pc-linux-gnu/#{APP_NAME}").each do |bin|
+  %W(#{mruby_root}/build/x86_64-pc-linux-gnu/bin/#{APP_NAME}
+     #{mruby_root}/build/i686-pc-linux-gnu/#{APP_NAME}").each do |bin|
     sh "strip --strip-unneeded #{bin}" if File.exist?(bin)
   end
 end
@@ -100,7 +101,7 @@ namespace :local do
 
   task :ensure_in_docker do
     unless is_in_a_docker_container? then
-      abort "Not running in docker, you should type \"docker-compose run <task>\"."
+      abort 'Not running in docker, you should type "docker-compose run <task>".'
     end
   end
 end

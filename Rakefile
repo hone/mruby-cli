@@ -145,7 +145,7 @@ namespace :local do
         `cp #{bin_dir}/#{bin_file} #{dir}/bin/`
         `git add #{dir}/bin/#{bin_file}`
       end
-      `git commit -m "Travis Build #{ENV['TRAVIS_BUILD_NUMBER']} on branch #{branch}"`
+      `git commit -m "Travis Build #{ENV['TRAVIS_BUILD_NUMBER']} on branch #{branch}\n[MRUBY_CLI_SHA:#{ENV['TRAVIS_COMMIT']}]"`
       `git push origin #{branch}`
     end
   end

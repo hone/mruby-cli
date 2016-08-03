@@ -137,7 +137,7 @@ namespace :local do
 
   def push_mruby_cli_bins(dir, branch)
     Dir.chdir(dir) do
-      `git checkout -B #{branch}`
+      `git checkout #{branch} || git checkout -b #{branch}`
       SUPPORTED_TARGET.each do |target, dir|
         bin_dir = "#{APP_ROOT}/mruby/build/#{dir}/bin"
         bin_file = "mruby-cli"

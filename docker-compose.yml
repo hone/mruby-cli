@@ -14,7 +14,7 @@ mtest:
   command: rake test:mtest
 clean:
   <<: *defaults
-  command: rake clean
+  command: rake deep_clean
 shell:
   <<: *defaults
   command: bash

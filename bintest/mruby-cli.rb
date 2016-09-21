@@ -12,7 +12,19 @@ assert('setup') do
       assert_true status.success?, "Process did not exit cleanly"
       assert_true Dir.exist?(app_name)
       Dir.chdir(app_name) do
-        (%w(.gitignore mrbgem.rake build_config.rb Rakefile Dockerfile docker-compose.yml) + ["tools/#{app_name}/#{app_name}.c", "mrblib/#{app_name}.rb", "bintest/#{app_name}.rb"]).each do |file|
+        %W[
+          .gitignore
+          mrbgem.rake
+          build_config.rb
+          Rakefile
+          Dockerfile
+          docker-compose.yml
+          tasks/package.rake
+          tasks/test.rake
+          tools/#{app_name}/#{app_name}.c
+          mrblib/#{app_name}.rb
+          bintest/#{app_name}.rb
+        ].each do |file|
           assert_true(File.exist?(file), "Could not find #{file}")
           assert_include output, " create  #{file}"
         end

@@ -304,7 +304,7 @@ mtest:
   command: rake test:mtest
 clean:
   <<: *defaults
-  command: rake clean
+  command: rake deep_clean
 shell:
   <<: *defaults
   command: bash
@@ -370,9 +370,7 @@ task :compile => [:all] do
 end
 
 desc "cleanup"
-task :clean do
-  sh "rake deep_clean"
-end
+task :clean
 
 desc "generate a release tarball"
 task :release => :compile do
@@ -551,8 +549,8 @@ source $HOME/.bash_profile
     EOF
   end
 
-  def log(package_dir, version, package)
-    puts "Writing packages #{package_dir}/#{version}/#{package}"
+  def log(dir, version, package)
+    puts "Writing packages #{dir}/#{version}/#{package}"
   end
 
   desc "create deb package"
@@ -562,7 +560,7 @@ source $HOME/.bash_profile
     ["x86_64", "i686"].each do |arch|
       release_tar_file = "mruby-cli-#{APP_VERSION}-#{arch}-pc-linux-gnu.tgz"
       arch_name = (arch == "x86_64" ? "amd64" : arch)
-      log(package_dir, APP_VERSION, "mruby-cli_#{APP_VERSION}_#{arch_name}.deb")
+      log(package_path, APP_VERSION, "mruby-cli_#{APP_VERSION}_#{arch_name}.deb")
       `fpm -s tar -t deb -a #{arch} -n mruby-cli -v #{APP_VERSION} --prefix /usr/bin -p #{package_path} #{release_path}/#{release_tar_file}`
     end
   end
@@ -573,7 +571,7 @@ source $HOME/.bash_profile
 
     ["x86_64", "i686"].each do |arch|
       release_tar_file = "mruby-cli-#{APP_VERSION}-#{arch}-pc-linux-gnu.tgz"
-      log(package_dir, APP_VERSION, "mruby-cli-#{APP_VERSION}-1.#{arch}.rpm")
+      log(package_path, APP_VERSION, "mruby-cli-#{APP_VERSION}-1.#{arch}.rpm")
       `fpm -s tar -t rpm -a #{arch} -n mruby-cli -v #{APP_VERSION} --prefix /usr/bin -p #{package_path} #{release_path}/#{release_tar_file}`
     end
   end
@@ -582,7 +580,7 @@ source $HOME/.bash_profile
   task :msi => [package_path, :release] do
     abort("msitools is not installed.  Please check your docker install.") unless check_msi_installed?
     ["x86_64", "i686"].each do |arch|
-      log(package_dir, APP_VERSION, "mruby-cli-#{APP_VERSION}-#{arch}.msi")
+      log(package_path, APP_VERSION, "mruby-cli-#{APP_VERSION}-#{arch}.msi")
       release_tar_file = "mruby-cli-#{APP_VERSION}-#{arch}-w64-mingw32.tgz"
       Dir.mktmpdir do |dest_dir|
         cd dest_dir
@@ -597,7 +595,7 @@ source $HOME/.bash_profile
   task :dmg => [package_path, :release] do
     abort("dmg tools are not installed.  Please check your docker install.") unless check_dmg_installed?
     ["x86_64", "i386"].each do |arch|
-      log(package_dir, APP_VERSION, "mruby-cli-#{APP_VERSION}-#{arch}.dmg")
+      log(package_path, APP_VERSION, "mruby-cli-#{APP_VERSION}-#{arch}.dmg")
       release_tar_file = "mruby-cli-#{APP_VERSION}-#{arch}-apple-darwin14.tgz"
       Dir.mktmpdir do |dest_dir|
         cd dest_dir

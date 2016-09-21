@@ -49,9 +49,7 @@ task :compile => [:all] do
 end
 
 desc "cleanup"
-task :clean do
-  sh "rake deep_clean"
-end
+task :clean
 
 desc "generate a release tarball"
 task :release => :compile do

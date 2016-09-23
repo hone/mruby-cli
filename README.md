@@ -40,6 +40,17 @@ root@3da278e931fc:/home/mruby/code# mruby/build/host/bin/hello_world
 Hello World
 ```
 
+### On Windows system
+
+When running on a windows system `docker-compose run`, you need to add the flag
+`-d`. For instance, `docker-compose run -d compile`. If you don't add it, you
+will got the following error:
+
+```
+[31mERROR
+Please pass the -d flag when using `docker-compose run`.
+```
+
 ## Docker
 
 Each app will be generated with a Dockerfile that inherits a base image.

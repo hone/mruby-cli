@@ -112,6 +112,7 @@ $ docker-compose run bintest
 * [mjruby](https://github.com/jkutner/mjruby) - replacement for jruby-launcher.
 * [mruby-eso-research](https://github.com/hone/mruby-eso-research) - an app for managing crafting research in Elder Scrolls Online. It uses YAML as the data store.
 * [nhk-easy-cli](https://github.com/nhk-ruby/nhk-easy-cli) - a command-line client for reading NHK News Web Easy.
+* [mruby-static](https://github.com/zzak/mruby-static) - a static site generator
 
 ## mruby-cli Development
 

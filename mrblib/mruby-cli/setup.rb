@@ -405,31 +405,33 @@ desc "generate a release tarball"
 task :release => :compile do
   require 'tmpdir'
 
-  # since we're in the mruby/
-  release_dir  = "releases/v\#{APP_VERSION}"
-  release_path = Dir.pwd + "/../\#{release_dir}"
-  app_name     = "\#{APP_NAME}-\#{APP_VERSION}"
-  FileUtils.mkdir_p(release_path)
+  Dir.chdir(mruby_root) do
+    # since we're in the mruby/
+    release_dir  = "releases/v\#{APP_VERSION}"
+    release_path = Dir.pwd + "/../\#{release_dir}"
+    app_name     = "\#{APP_NAME}-\#{APP_VERSION}"
+    FileUtils.mkdir_p(release_path)
 
-  Dir.mktmpdir do |tmp_dir|
-    Dir.chdir(tmp_dir) do
-      MRuby.each_target do |target|
-        next if name == "host"
+    Dir.mktmpdir do |tmp_dir|
+      Dir.chdir(tmp_dir) do
+        MRuby.each_target do |target|
+          next if name == "host"
 
-        arch = name
-        bin  = "\#{build_dir}/bin/\#{exefile(APP_NAME)}"
-        FileUtils.mkdir_p(name)
-        FileUtils.cp(bin, name)
+          arch = name
+          bin  = "\#{build_dir}/bin/\#{exefile(APP_NAME)}"
+          FileUtils.mkdir_p(name)
+          FileUtils.cp(bin, name)
 
-        Dir.chdir(arch) do
-          arch_release = "\#{app_name}-\#{arch}"
-          puts "Writing \#{release_dir}/\#{arch_release}.tgz"
-          `tar czf \#{release_path}/\#{arch_release}.tgz *`
+          Dir.chdir(arch) do
+            arch_release = "\#{app_name}-\#{arch}"
+            puts "Writing \#{release_dir}/\#{arch_release}.tgz"
+            `tar czf \#{release_path}/\#{arch_release}.tgz *`
+          end
         end
-      end
 
-      puts "Writing \#{release_dir}/\#{app_name}.tgz"
-      `tar czf \#{release_path}/\#{app_name}.tgz *`
+        puts "Writing \#{release_dir}/\#{app_name}.tgz"
+        `tar czf \#{release_path}/\#{app_name}.tgz *`
+      end
     end
   end
 end

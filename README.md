@@ -100,6 +100,12 @@ These tests are unit tests, are written in mruby, and go in the `test/` director
 $ docker-compose run mtest
 ```
 
+If you want to enable verbose option, to run them just execute:
+
+```sh
+$ docker-compose run mtest -v
+```
+
 #### bintest
 These are integration tests, are written in CRuby (MRI), and go in the `bintest/` directory. It tests the status and output of the host binary inside a docker container. To run them just execute:
 

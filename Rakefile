@@ -1,5 +1,7 @@
 require 'fileutils'
 
+$verbose = Rake.verbose == Rake::FileUtilsExt::DEFAULT ? false : Rake.verbose
+
 MRUBY_VERSION="1.2.0"
 
 file :mruby do

@@ -298,31 +298,46 @@ compile: &defaults
   build: .
   volumes:
     - .:/home/mruby/code:rw
-  command: rake compile
+  entrypoint:
+    - rake
+    - compile
 test:
   <<: *defaults
-  command: rake test
+  entrypoint:
+    - rake
+    - test
 bintest:
   <<: *defaults
-  command: rake test:bintest
+  entrypoint:
+    - rake
+    - test:bintest
 mtest:
   <<: *defaults
-  command: rake test:mtest
+  entrypoint:
+    - rake
+    - test:mtest
 clean:
   <<: *defaults
-  command: rake clean
+  entrypoint:
+    - rake
+    - clean
 shell:
   <<: *defaults
-  command: bash
+  entrypoint:
+    - bash
 release:
   <<: *defaults
-  command: rake release
+  entrypoint:
+    - rake
+    - release
 DOCKER_COMPOSE_YML
     end
 
     def rakefile
       <<RAKEFILE
 require 'fileutils'
+
+$verbose = Rake.verbose == Rake::FileUtilsExt::DEFAULT ? false : Rake.verbose
 
 MRUBY_VERSION="1.2.0"
 

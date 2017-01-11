@@ -1,0 +1,12 @@
+version: 2
+executorType: machine
+
+stages:
+  build:
+    workDir: ~/mruby-cli
+    steps:
+      - type: checkout
+      - type: shell
+        name: Run Tests
+        command: sudo docker-compose build && sudo docker-compose run test
+

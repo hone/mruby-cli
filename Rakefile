@@ -127,6 +127,50 @@ namespace :local do
   task :version do
     puts "#{APP_NAME} #{APP_VERSION}"
   end
+
+  def clone_mruby_cli_bins
+    Dir.chdir(APP_ROOT) do
+      `git clone git@github.com:toch/mruby-cli-bins.git`
+      return "#{APP_ROOT}/mruby-cli-bins" if $?.success?
+    end
+    nil
+  end
+
+  def detect_current_branch
+    return nil unless ENV.key? 'TRAVIS'
+    return ENV['TRAVIS_BRANCH'] if ENV['TRAVIS_PULL_REQUEST'] == "false"
+    nil
+  end
+
+  SUPPORTED_TARGET = {
+    "linux" => "x86_64-pc-linux-gnu",
+    "osx" => "x86_64-apple-darwin14",
+    "win" => "x86_64-w64-mingw32"
+  }
+
+  def push_mruby_cli_bins(dir, branch)
+    Dir.chdir(dir) do
+      `git checkout #{branch} || git checkout -b #{branch}`
+      SUPPORTED_TARGET.each do |target, dir|
+        bin_dir = "#{APP_ROOT}/mruby/build/#{dir}/bin"
+        bin_file = "mruby-cli"
+        bin_file << ".exe" if target == "win"
+        `cp #{bin_dir}/#{bin_file} #{dir}/bin/`
+        `git add #{dir}/bin/#{bin_file}`
+      end
+      `git commit -m "Travis Build #{ENV['TRAVIS_BUILD_NUMBER']} on branch #{branch}\n[MRUBY_CLI_SHA:#{ENV['TRAVIS_COMMIT']}]"`
+      `git push origin #{branch}`
+    end
+  end
+
+  desc "prepare the bins and send them to mruby-cli-bins"
+  task :send_bins_for_test do
+    mruby_cli_bins_dir = clone_mruby_cli_bins
+    abort "[send bins for test] impossible to clone mruby-cli-bins" unless mruby_cli_bins_dir
+    current_branch = detect_current_branch
+    abort "[send bins for test] impossible to detect current branch" unless current_branch
+    push_mruby_cli_bins(mruby_cli_bins_dir, current_branch)
+  end
 end
 
 def is_in_a_docker_container?

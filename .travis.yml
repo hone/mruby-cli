@@ -3,9 +3,17 @@ sudo: required
 services:
   - docker
 before_install:
+  - openssl aes-256-cbc -K $encrypted_e0bbaa80af07_key -iv $encrypted_e0bbaa80af07_iv -in .travis/sshkey-mruby-cli-bins-travis.enc -out .travis/sshkey-mruby-cli-bins-travis -d
   - sudo apt-get -qq update
 install:
-  - sudo sh -c "curl -L https://github.com/docker/compose/releases/download/1.3.3/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose"
+  - sudo sh -c "curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose";
   - sudo chmod +x /usr/local/bin/docker-compose
 script:
   - docker-compose run test
+after_success:
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
+      eval "$(ssh-agent -s)";
+      chmod 600 .travis/sshkey-mruby-cli-bins-travis;
+      ssh-add .travis/sshkey-mruby-cli-bins-travis;
+      rake local:send_bins_for_test;
+    fi

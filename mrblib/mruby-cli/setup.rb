@@ -358,6 +358,12 @@ task :compile => [:all] do
     %W(\#{mruby_root}/build/x86_64-pc-linux-gnu/bin/\#{APP_NAME} \#{mruby_root}/build/i686-pc-linux-gnu/\#{APP_NAME}).each do |bin|
       sh "strip --strip-unneeded \#{bin}" if File.exist?(bin)
     end
+    %W(\#{mruby_root}/build/x86_64-apple-darwin14/bin/\#{APP_NAME} \#{mruby_root}/build/i386-apple-darwin14/\#{APP_NAME}).each do |bin|
+      sh "x86_64-apple-darwin14-strip -u -r -arch all \#{bin}" if File.exist?(bin)
+    end
+    %W(\#{mruby_root}/build/x86_64-w64-mingw32/bin/\#{APP_NAME}.exe \#{mruby_root}/build/i686-w64-mingw32/\#{APP_NAME}.exe).each do |bin|
+      sh "strip --strip-unneeded \#{bin}" if File.exist?(bin)
+    end
   end
 end
 
